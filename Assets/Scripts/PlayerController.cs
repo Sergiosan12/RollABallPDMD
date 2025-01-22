@@ -1,46 +1,81 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
- // Rigidbody of the player.
- private Rigidbody rb; 
+    private Rigidbody rb; // Rigidbody del jugador.
+    private int count;
+    private float movementX;
+    private float movementY;
+    
 
- // Movement along X and Y axes.
- private float movementX;
- private float movementY;
+    public float speed = 10f; // Velocidad de movimiento.
+    public TextMeshProUGUI countText;
+    public GameObject winTextObject;
+    public Transform cameraTransform; // Transform de la cámara para orientar el movimiento.
 
- // Speed at which the player moves.
- public float speed = 0; 
-
- // Start is called before the first frame update.
- void Start()
+    void Start()
     {
- // Get and store the Rigidbody component attached to the player.
+        winTextObject.SetActive(false);
+        SetCountText();
+        count = 0;
         rb = GetComponent<Rigidbody>();
     }
- 
- // This function is called when a move input is detected.
- void OnMove(InputValue movementValue)
-    {
- // Convert the input value into a Vector2 for movement.
-        Vector2 movementVector = movementValue.Get<Vector2>();
 
- // Store the X and Y components of the movement.
-        movementX = movementVector.x; 
-        movementY = movementVector.y; 
+    void OnMove(InputValue movementValue)
+    {
+        // Detectar únicamente las teclas de flecha
+        if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.downArrowKey.isPressed ||
+            Keyboard.current.leftArrowKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
+        {
+            Vector2 movementVector = movementValue.Get<Vector2>();
+            movementX = movementVector.x;
+            movementY = movementVector.y;
+        }
+        else
+        {
+            // No se mueve si no se presionan las teclas de flecha
+            movementX = 0;
+            movementY = 0;
+        }
     }
 
- // FixedUpdate is called once per fixed frame-rate frame.
- private void FixedUpdate() 
-    {
- // Create a 3D movement vector using the X and Y inputs.
-        Vector3 movement = new Vector3 (movementX, 0.0f, movementY);
+    void SetCountText() 
+   {
+       countText.text =  "Count: " + count.ToString();
+       if (count >= 15)
+       {
+           winTextObject.SetActive(true);
+       }
+   }
 
- // Apply force to the Rigidbody to move the player.
-        rb.AddForce(movement * speed); 
+    void FixedUpdate()
+    {
+        // Movimiento relativo a la cámara
+        Vector3 forward = cameraTransform.forward;
+        Vector3 right = cameraTransform.right;
+
+        // Ignorar la inclinación vertical de la cámara
+        forward.y = 0f;
+        right.y = 0f;
+
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 movement = forward * movementY + right * movementX;
+        rb.AddForce(movement * speed);
+    }
+
+    void OnTriggerEnter (Collider other) 
+    {
+       if (other.gameObject.CompareTag("PickUp")) 
+       {
+           other.gameObject.SetActive(false);
+           count = count + 1;
+           SetCountText();
+       }
     }
 }
