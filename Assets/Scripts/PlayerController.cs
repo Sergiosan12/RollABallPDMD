@@ -10,9 +10,10 @@ public class PlayerController : MonoBehaviour
     private int count;
     private float movementX;
     private float movementY;
-    
+    private bool isGrounded; // Verifica si la bola está en el suelo.
 
     public float speed = 10f; // Velocidad de movimiento.
+    public float jumpForce = 5f; // Fuerza del salto.
     public TextMeshProUGUI countText;
     public GameObject winTextObject;
     public Transform cameraTransform; // Transform de la cámara para orientar el movimiento.
@@ -23,6 +24,7 @@ public class PlayerController : MonoBehaviour
         SetCountText();
         count = 0;
         rb = GetComponent<Rigidbody>();
+        isGrounded = false; // Inicialmente está en el suelo.
     }
 
     void OnMove(InputValue movementValue)
@@ -37,39 +39,61 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            // No se mueve si no se presionan las teclas de flecha
             movementX = 0;
             movementY = 0;
         }
     }
 
-    void SetCountText() 
-   {
-       countText.text =  "Count: " + count.ToString();
-       if (count >= 15)
-       {
-    // Display the win text.
-            winTextObject.SetActive(true);
-
-    // Destroy the enemy GameObject.
-            Destroy(GameObject.FindGameObjectWithTag("Enemy"));
-
-       }
-   }
-
-    private void OnCollisionEnter(Collision collision)
+    void Update()
     {
-     if (collision.gameObject.CompareTag("Enemy"))
+        // Si está en el suelo y se presiona espacio, salta
+        if (isGrounded && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            // Destroy the current object
-            Destroy(gameObject); 
-    
-            // Update the winText to display "You Lose!"
-            winTextObject.gameObject.SetActive(true);
-            winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose!";
-    
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            isGrounded = false; // Evita que salte en el aire.
         }
+    }
 
+    // Mejor detección del suelo
+    void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true; // Si la bola sigue en contacto con el suelo, puede saltar de nuevo.
+        }
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false; // Si la bola deja de tocar el suelo, no puede saltar hasta que vuelva a aterrizar.
+        }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Destroy(gameObject);
+            winTextObject.gameObject.SetActive(true);
+            winTextObject.GetComponent<TextMeshProUGUI>().text = "Perdiste!";
+        }
+    }
+
+    void SetCountText()
+    {
+        countText.text = "Puntuación: " + count.ToString();
+        if (count >= 15)
+        {
+            winTextObject.SetActive(true);
+            // Encuentra y destruye todos los enemigos
+            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+            foreach (GameObject enemy in enemies)
+            {
+               Destroy(enemy);
+            }
+        }
     }
 
     void FixedUpdate()
@@ -78,7 +102,6 @@ public class PlayerController : MonoBehaviour
         Vector3 forward = cameraTransform.forward;
         Vector3 right = cameraTransform.right;
 
-        // Ignorar la inclinación vertical de la cámara
         forward.y = 0f;
         right.y = 0f;
 
@@ -89,13 +112,13 @@ public class PlayerController : MonoBehaviour
         rb.AddForce(movement * speed);
     }
 
-    void OnTriggerEnter (Collider other) 
+    void OnTriggerEnter(Collider other)
     {
-       if (other.gameObject.CompareTag("PickUp")) 
-       {
-           other.gameObject.SetActive(false);
-           count = count + 1;
-           SetCountText();
-       }
+        if (other.gameObject.CompareTag("PickUp"))
+        {
+            other.gameObject.SetActive(false);
+            count = count + 1;
+            SetCountText();
+        }
     }
 }
