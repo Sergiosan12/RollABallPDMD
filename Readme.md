@@ -16,8 +16,12 @@ El jugador puede moverse en el entorno 3D utilizando las teclas de flecha. El mo
 ### **Control de Cámaras**
 El jugador puede cambiar entre la vista en primera persona y la vista en tercera persona presionando los botones 1 y 2, respectivamente. Esto permite al jugador elegir la perspectiva que prefiera para jugar.
 
+![cambioCamara](https://github.com/user-attachments/assets/b722f256-47be-4a46-8b28-0efa96a839a3)
+
 ### **Contacto con Obstáculos**
 El jugador puede interactuar con varios obstáculos en el entorno. Estos obstáculos pueden ser derribados o empujados, añadiendo un elemento de física al juego.
+
+![Obstaculos](https://github.com/user-attachments/assets/f969fdf1-84a7-43d2-bc08-e7cb6f1fe108)
 
 ### **Recolección de Pickups**
 El jugador puede recoger objetos etiquetados como "PickUp". Al recoger estos objetos, se incrementa un contador y el objeto se desactiva. El objetivo es recoger todos los pickups para ganar el juego.
@@ -25,17 +29,27 @@ El jugador puede recoger objetos etiquetados como "PickUp". Al recoger estos obj
 ### **Persecución del Enemigo**
 Dos enemigos persiguen al jugador, creando un desafío adicional. Los enemigos se mueven hacia el jugador, aumentando la dificultad del juego.
 
+![EnemigoYPickUp](https://github.com/user-attachments/assets/3b5a2f4e-b58b-41c7-97ee-51fba2b61c4d)
+
 ### **Boost de la Rampa**
 El jugador puede recibir un impulso al pasar por una rampa especial. Este impulso permite saltos más altos o movimientos más rápidos.
+
+![saltoRampa](https://github.com/user-attachments/assets/588bfddc-aa59-42ec-b7f2-7669143d6ad7)
 
 ### **Salto del Jugador**
 El jugador puede saltar al presionar la tecla de espacio. El salto se realiza aplicando una fuerza hacia arriba, y solo es posible si el jugador está en el suelo.
 
+![SaltoYDerribables](https://github.com/user-attachments/assets/d41db3b9-fbc6-42bf-b43b-a5d886ec26a8)
+
 ### **Condición de Derrota**
 Si un enemigo toca al jugador, se muestra un mensaje de "¡Perdiste!" en la pantalla, indicando que el jugador ha sido atrapado.
 
+![Perder](https://github.com/user-attachments/assets/c1a43ebe-aee2-4462-97c3-267c80798686)
+
 ### **Condición de Victoria**
 Cuando el jugador recoge todos los pickups, se muestra un mensaje de "¡Ganaste!" en la pantalla. Además, los enemigos son eliminados automáticamente al alcanzar la puntuación máxima.
+
+![Ganar](https://github.com/user-attachments/assets/62387a24-273e-43ca-955e-ab4d64a501cf)
 
 </details>
 
