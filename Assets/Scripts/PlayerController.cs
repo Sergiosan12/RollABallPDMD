@@ -6,17 +6,20 @@ using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
-    private Rigidbody rb; // Rigidbody del jugador.
+    private Rigidbody rb;
     private int count;
     private float movementX;
     private float movementY;
-    private bool isGrounded; // Verifica si la bola está en el suelo.
+    private bool isGrounded;
 
-    public float speed = 10f; // Velocidad de movimiento.
-    public float jumpForce = 5f; // Fuerza del salto.
+    public float speed = 10f;
+    public float jumpForce = 5f;
     public TextMeshProUGUI countText;
     public GameObject winTextObject;
-    public Transform cameraTransform; // Transform de la cámara para orientar el movimiento.
+    public Transform cameraTransform;
+
+    private enum PlayerState { Inactivo, Moviendo, Saltando, Cayendo, Muerto }
+    private PlayerState currentState;
 
     void Start()
     {
@@ -24,42 +27,47 @@ public class PlayerController : MonoBehaviour
         SetCountText();
         count = 0;
         rb = GetComponent<Rigidbody>();
-        isGrounded = false; // Inicialmente está en el suelo.
+        isGrounded = false;
+        currentState = PlayerState.Inactivo;
     }
 
     void OnMove(InputValue movementValue)
     {
-        // Detectar únicamente las teclas de flecha
         if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.downArrowKey.isPressed ||
             Keyboard.current.leftArrowKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
         {
             Vector2 movementVector = movementValue.Get<Vector2>();
             movementX = movementVector.x;
             movementY = movementVector.y;
+            currentState = PlayerState.Moviendo;
         }
         else
         {
             movementX = 0;
             movementY = 0;
+            currentState = PlayerState.Inactivo;
         }
     }
 
     void Update()
     {
-        // Si está en el suelo y se presiona espacio, salta
         if (isGrounded && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            isGrounded = false; // Evita que salte en el aire.
+            isGrounded = false;
+            currentState = PlayerState.Saltando;
         }
     }
 
-    // Mejor detección del suelo
     void OnCollisionStay(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            isGrounded = true; // Si la bola sigue en contacto con el suelo, puede saltar de nuevo.
+            isGrounded = true;
+            if (currentState == PlayerState.Cayendo)
+            {
+                currentState = PlayerState.Inactivo;
+            }
         }
     }
 
@@ -67,32 +75,29 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            isGrounded = false; // Si la bola deja de tocar el suelo, no puede saltar hasta que vuelva a aterrizar.
+            isGrounded = false;
+            currentState = PlayerState.Cayendo;
         }
     }
 
     void OnTriggerEnter(Collider other)
     {
-
         if (other.gameObject.CompareTag("Enemy"))
         {
             Debug.Log("El jugador ha tocado un enemigo.");
+            currentState = PlayerState.Muerto;
             Destroy(gameObject);
             winTextObject.SetActive(true);
             winTextObject.GetComponent<TextMeshProUGUI>().text = "Perdiste!";
         }
-
-        if (other.gameObject.CompareTag("PickUp"))
+        else if (other.gameObject.CompareTag("PickUp"))
         {
             Debug.Log("Se ha recogido un PickUp.");
             other.gameObject.SetActive(false);
-            count = count + 1;
+            count++;
             SetCountText();
         }
     }
-
-
-    
 
     void SetCountText()
     {
@@ -100,18 +105,19 @@ public class PlayerController : MonoBehaviour
         if (count >= 15)
         {
             winTextObject.SetActive(true);
-            // Encuentra y destruye todos los enemigos
             GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
             foreach (GameObject enemy in enemies)
             {
-               Destroy(enemy);
+                Destroy(enemy);
             }
         }
     }
 
     void FixedUpdate()
     {
-        // Movimiento relativo a la cámara
+        if (currentState == PlayerState.Muerto)
+            return;
+
         Vector3 forward = cameraTransform.forward;
         Vector3 right = cameraTransform.right;
 
@@ -124,7 +130,4 @@ public class PlayerController : MonoBehaviour
         Vector3 movement = forward * movementY + right * movementX;
         rb.AddForce(movement * speed);
     }
-
-    
 }
-
