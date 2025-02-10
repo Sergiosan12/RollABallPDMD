@@ -8,7 +8,7 @@ public class RampBoostTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player")) // Verifica que la bola tenga el tag "Player"
+        if (other.CompareTag("Player")) // Si el objeto que entra en el trigger es el jugador
         {
             Rigidbody rb = other.GetComponent<Rigidbody>(); // Obtiene el Rigidbody de la bola
             if (rb != null)

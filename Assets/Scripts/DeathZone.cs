@@ -5,7 +5,7 @@ public class DeathZone : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))  // Asegúrate de que la bola tenga el tag "Player"
+        if (other.CompareTag("Player")) // Si el objeto que colisiona es el jugador
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Reinicia la escena
         }

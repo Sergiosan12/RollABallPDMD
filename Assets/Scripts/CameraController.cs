@@ -22,6 +22,7 @@ public class CameraController : MonoBehaviour
     private float rotationX = 0f;
     private float rotationY = 0f;
 
+    // Inicialización de la cámara.
     void Start()
     {
         TerceraPersonaOffset = new Vector3(0, TerceraPersonaHeight, -TerceraPersonaDistance);
@@ -47,19 +48,20 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    // Actualización de la cámara después de que todos los objetos se han movido.
     void LateUpdate()
     {
-        if (player == null)
+        if (player == null) // Si el jugador ha sido destruido, la cámara ya no lo sigue.
         {
             Debug.Log("El jugador ha sido destruido, la cámara ya no lo sigue.");
             return;
         }
 
-        if (currentState == CameraState.PrimeraPersona)
+        if (currentState == CameraState.PrimeraPersona) // Si está en primera persona, sigue al jugador con un offset.
         {
             transform.position = player.transform.position + Vector3.up * PrimeraPersonaHeightOffset;
         }
-        else if (currentState == CameraState.TerceraPersona)
+        else if (currentState == CameraState.TerceraPersona) // Si está en tercera persona, sigue al jugador con un offset.
         {
             Vector3 desiredPosition = player.transform.position + TerceraPersonaOffset;
             transform.position = desiredPosition;
@@ -67,6 +69,7 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    // Rotación de la cámara en primera
     void CamaraPrimeraPersona()
     {
         if (Input.GetKey(KeyCode.A)) rotationY -= rotationSpeed * Time.deltaTime;
