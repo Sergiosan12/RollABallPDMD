@@ -5,27 +5,37 @@ using UnityEngine.AI;
 
 public class EnemyMovement : MonoBehaviour
 {
- // Reference to the player's transform.
- public Transform player;
+    private enum EnemyState { Idle, Chasing }
+    private EnemyState currentState;
 
- // Reference to the NavMeshAgent component for pathfinding.
- private NavMeshAgent navMeshAgent;
+    public Transform player;
+    private NavMeshAgent navMeshAgent;
 
- // Start is called before the first frame update.
- void Start()
+    void Start()
     {
- // Get and store the NavMeshAgent component attached to this object.
         navMeshAgent = GetComponent<NavMeshAgent>();
+        currentState = EnemyState.Idle;
     }
 
- // Update is called once per frame.
- void Update()
+    void Update()
     {
- // If there's a reference to the player...
- if (player != null)
-        {    
- // Set the enemy's destination to the player's current position.
+        if (player != null)
+        {
+            if (currentState != EnemyState.Chasing) // Solo cambia si es diferente
+            {
+                currentState = EnemyState.Chasing;
+                Debug.Log("El enemigo está persiguiendo al jugador."); // Debug para verificar el estado
+            }
+            
             navMeshAgent.SetDestination(player.position);
+        }
+        else
+        {
+            if (currentState != EnemyState.Idle)
+            {
+                currentState = EnemyState.Idle;
+                Debug.Log("El enemigo está en espera.");
+            }
         }
     }
 }
