@@ -51,6 +51,12 @@ public class CameraController : MonoBehaviour
 
     void LateUpdate()
     {
+        if (player == null)
+        {
+            Debug.Log("El jugador ha sido destruido, la cámara ya no lo sigue.");
+            return; // Evita que el código siga ejecutándose
+        }
+
         if (isFirstPerson)
         {
             // Mantener la cámara en la posición del jugador con un offset en altura.

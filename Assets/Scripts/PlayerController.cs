@@ -71,15 +71,28 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter(Collision collision)
+    void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+
+        if (other.gameObject.CompareTag("Enemy"))
         {
+            Debug.Log("El jugador ha tocado un enemigo.");
             Destroy(gameObject);
-            winTextObject.gameObject.SetActive(true);
+            winTextObject.SetActive(true);
             winTextObject.GetComponent<TextMeshProUGUI>().text = "Perdiste!";
         }
+
+        if (other.gameObject.CompareTag("PickUp"))
+        {
+            Debug.Log("Se ha recogido un PickUp.");
+            other.gameObject.SetActive(false);
+            count = count + 1;
+            SetCountText();
+        }
     }
+
+
+    
 
     void SetCountText()
     {
@@ -112,13 +125,6 @@ public class PlayerController : MonoBehaviour
         rb.AddForce(movement * speed);
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("PickUp"))
-        {
-            other.gameObject.SetActive(false);
-            count = count + 1;
-            SetCountText();
-        }
-    }
+    
 }
+

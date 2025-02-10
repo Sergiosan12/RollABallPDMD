@@ -743,7 +743,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8c6bc94ecb5c2aac980bae697f1387f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boostForce: 7
+  boostForce: 8
 --- !u!33 &109683272
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3298,7 +3298,7 @@ GameObject:
   - component: {fileID: 772701536}
   m_Layer: 0
   m_Name: Enemies
-  m_TagString: Enemy
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
