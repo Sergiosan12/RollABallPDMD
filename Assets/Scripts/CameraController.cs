@@ -6,28 +6,26 @@ public class CameraController : MonoBehaviour
 {
     public GameObject player; // Referencia al jugador (la bola).
 
+    private enum CameraState { TerceraPersona, PrimeraPersona } // Estados de la cámara
+    private CameraState currentState; // Estado actual de la cámara
+
     // Configuración para la vista en tercera persona.
-    private Vector3 thirdPersonOffset; // Offset calculado dinámicamente al iniciar.
-    public float thirdPersonHeight = 10f; // Altura de la cámara en tercera persona.
-    public float thirdPersonDistance = 10f; // Distancia de la cámara al jugador.
-    public float thirdPersonAngle = 90f; // Ángulo de inclinación.
+    private Vector3 TerceraPersonaOffset;
+    public float TerceraPersonaHeight = 10f;
+    public float TerceraPersonaDistance = 10f;
+    public float TerceraPersonaAngle = 90f;
 
     // Configuración para la vista en primera persona.
-    public float rotationSpeed = 100f; // Velocidad de rotación para la cámara en primera persona.
-    public float firstPersonHeightOffset = 0.5f; // Altura de la cámara en primera persona.
+    public float rotationSpeed = 100f;
+    public float PrimeraPersonaHeightOffset = 0.5f;
 
-    private float rotationX = 0f; // Rotación acumulada en el eje vertical (primera persona).
-    private float rotationY = 0f; // Rotación acumulada en el eje horizontal (primera persona).
-
-    private bool isFirstPerson = false; // Indica si está en modo primera persona.
+    private float rotationX = 0f;
+    private float rotationY = 0f;
 
     void Start()
     {
-        // Configurar el offset inicial para la vista en tercera persona.
-        thirdPersonOffset = new Vector3(0, thirdPersonHeight, -thirdPersonDistance);
-
-        // Iniciar en vista de tercera persona.
-        isFirstPerson = false;
+        TerceraPersonaOffset = new Vector3(0, TerceraPersonaHeight, -TerceraPersonaDistance);
+        currentState = CameraState.TerceraPersona; // Inicia en tercera persona
     }
 
     void Update()
@@ -35,15 +33,15 @@ public class CameraController : MonoBehaviour
         // Alternar entre cámaras con las teclas 1 y 2.
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            isFirstPerson = false;
+            currentState = CameraState.TerceraPersona;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            isFirstPerson = true;
+            currentState = CameraState.PrimeraPersona;
         }
 
-        // Controlar la rotación si está en primera persona.
-        if (isFirstPerson)
+        // Si está en primera persona, permite la rotación de la cámara
+        if (currentState == CameraState.PrimeraPersona)
         {
             CamaraPrimeraPersona();
         }
@@ -54,52 +52,29 @@ public class CameraController : MonoBehaviour
         if (player == null)
         {
             Debug.Log("El jugador ha sido destruido, la cámara ya no lo sigue.");
-            return; // Evita que el código siga ejecutándose
+            return;
         }
 
-        if (isFirstPerson)
+        if (currentState == CameraState.PrimeraPersona)
         {
-            // Mantener la cámara en la posición del jugador con un offset en altura.
-            transform.position = player.transform.position + Vector3.up * firstPersonHeightOffset;
+            transform.position = player.transform.position + Vector3.up * PrimeraPersonaHeightOffset;
         }
-        else
+        else if (currentState == CameraState.TerceraPersona)
         {
-            // Configurar la cámara en tercera persona.
-            Vector3 desiredPosition = player.transform.position + thirdPersonOffset;
+            Vector3 desiredPosition = player.transform.position + TerceraPersonaOffset;
             transform.position = desiredPosition;
-
-            // Hacer que la cámara mire al jugador.
             transform.LookAt(player.transform.position);
         }
     }
 
     void CamaraPrimeraPersona()
     {
-        // Rotación horizontal con A y D.
-        if (Input.GetKey(KeyCode.A))
-        {
-            rotationY -= rotationSpeed * Time.deltaTime;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            rotationY += rotationSpeed * Time.deltaTime;
-        }
+        if (Input.GetKey(KeyCode.A)) rotationY -= rotationSpeed * Time.deltaTime;
+        if (Input.GetKey(KeyCode.D)) rotationY += rotationSpeed * Time.deltaTime;
+        if (Input.GetKey(KeyCode.W)) rotationX -= rotationSpeed * Time.deltaTime;
+        if (Input.GetKey(KeyCode.S)) rotationX += rotationSpeed * Time.deltaTime;
 
-        // Rotación vertical con W y S.
-        if (Input.GetKey(KeyCode.W))
-        {
-            rotationX -= rotationSpeed * Time.deltaTime;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            rotationX += rotationSpeed * Time.deltaTime;
-        }
-
-        // Limitar la rotación vertical.
         rotationX = Mathf.Clamp(rotationX, -90f, 90f);
-
-        // Aplicar la rotación calculada.
-        Quaternion rotation = Quaternion.Euler(rotationX, rotationY, 0f);
-        transform.rotation = rotation;
+        transform.rotation = Quaternion.Euler(rotationX, rotationY, 0f);
     }
 }
