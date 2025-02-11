@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     private float movementX;
     private float movementY;
     private bool isGrounded;
+    private Animator animator;
+
 
     public float speed = 10f;
     public float jumpForce = 5f;
@@ -18,7 +20,7 @@ public class PlayerController : MonoBehaviour
     public GameObject winTextObject;
     public Transform cameraTransform;
 
-    private enum PlayerState { Inactivo, Moviendo, Saltando, Cayendo, Muerto } // Estados del jugador
+    private enum PlayerState { Idle, Walking, Jumping, Falling, Dead } // Estados del jugador
     private PlayerState currentState; // Estado actual del jugador
 
     // Se llama antes de la primera actualización del marco
@@ -29,37 +31,62 @@ public class PlayerController : MonoBehaviour
         count = 0;
         rb = GetComponent<Rigidbody>();
         isGrounded = false;
-        currentState = PlayerState.Inactivo; // Estado inicial del jugador es inactivo
+        currentState = PlayerState.Idle; // Estado inicial del jugador es Idle
+        animator = GetComponent<Animator>();
+
     }
 
     // Se llama cuando el jugador presiona una tecla
     void OnMove(InputValue movementValue)
     {
         if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.downArrowKey.isPressed ||
-            Keyboard.current.leftArrowKey.isPressed || Keyboard.current.rightArrowKey.isPressed) // Si el jugador presiona una tecla de movimiento se actualiza el estado a moviendo
-        {
-            Vector2 movementVector = movementValue.Get<Vector2>(); // Obtiene el vector de movimiento
-            movementX = movementVector.x;
-            movementY = movementVector.y;
-            currentState = PlayerState.Moviendo; // Actualiza el estado del jugador a moviendo
-        }
-        else // Si el jugador no presiona ninguna tecla de movimiento se actualiza el estado a inactivo
-        {
-            movementX = 0;
-            movementY = 0;
-            currentState = PlayerState.Inactivo; // Actualiza el estado del jugador a inactivo
-        }
+        Keyboard.current.leftArrowKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
+    {
+        Vector2 movementVector = movementValue.Get<Vector2>();
+        movementX = movementVector.x;
+        movementY = movementVector.y;
+        currentState = PlayerState.Walking;
+        UpdateAnimator();
+    }
+    else
+    {
+        movementX = 0;
+        movementY = 0;
+        currentState = PlayerState.Idle;
+        UpdateAnimator();
+    }
     }
 
     // Se llama cuando el jugador presiona la tecla de salto
     void Update()
-    {
-        if (isGrounded && Keyboard.current.spaceKey.wasPressedThisFrame) // Si el jugador está en el suelo y presiona la tecla de espacio
         {
+        if (isGrounded && Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            animator.SetBool("isJumping", true);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); // El jugador salta
             isGrounded = false;
-            currentState = PlayerState.Saltando; // Actualiza el estado del jugador a saltando
+            currentState = PlayerState.Jumping; // Actualiza el estado del jugador a Jumping
+            UpdateAnimator();
         }
+        else if (!isGrounded)
+        {
+            animator.SetBool("isJumping", false);
+            animator.SetBool("isFalling", true);
+        }
+        else
+        {
+            animator.SetBool("isFalling", false);
+        }    
+        if (movementX != 0 || movementY != 0)
+        {
+            animator.SetBool("isWalking", true);
+        }
+        else
+        {
+            animator.SetBool("isWalking", false);
+        }
+
+        
     }
 
     // Se llama cuando el jugador colisiona con un objeto
@@ -68,9 +95,10 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground")) // Si el jugador colisiona con el suelo con la etiqueta "Ground"
         {
             isGrounded = true; // Se cambia isGrounded a verdadero
-            if (currentState == PlayerState.Cayendo) // Si el estado actual del jugador es cayendo
+            if (currentState == PlayerState.Falling) // Si el estado actual del jugador es Falling
             {
-                currentState = PlayerState.Inactivo; // Se cambia el estado a inactivo
+                currentState = PlayerState.Idle; // Se cambia el estado a Idle
+                UpdateAnimator();
             }
         }
     }
@@ -81,7 +109,8 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground")) // Si el jugador deja de colisionar con el suelo con la etiqueta "Ground"
         {
             isGrounded = false;
-            currentState = PlayerState.Cayendo; // Se cambia el estado a cayendo
+            currentState = PlayerState.Falling; // Se cambia el estado a Falling
+            UpdateAnimator();
         }
     }
 
@@ -91,7 +120,8 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("Enemy")) // Si el jugador colisiona con un enemigo
         {
             Debug.Log("El jugador ha tocado un enemigo.");
-            currentState = PlayerState.Muerto; // Se cambia el estado a muerto
+            currentState = PlayerState.Dead; // Se cambia el estado a Dead
+            UpdateAnimator();
             Destroy(gameObject); // Se destruye el jugador
             winTextObject.SetActive(true); // Se muestra el mensaje de perder
             winTextObject.GetComponent<TextMeshProUGUI>().text = "Perdiste!"; // Se muestra el mensaje de perder
@@ -123,7 +153,7 @@ public class PlayerController : MonoBehaviour
     // Se llama para actualizar la física
     void FixedUpdate()
     {
-        if (currentState == PlayerState.Muerto) // Si el estado actual del jugador es muerto
+        if (currentState == PlayerState.Dead) // Si el estado actual del jugador es Dead
             return; // Se sale de la función
 
         Vector3 forward = cameraTransform.forward; // Obtiene la dirección hacia adelante de la cámara
@@ -138,4 +168,13 @@ public class PlayerController : MonoBehaviour
         Vector3 movement = forward * movementY + right * movementX; // Calcula el vector de movimiento
         rb.AddForce(movement * speed); // Aplica la fuerza de movimiento al jugador
     }
+
+    void UpdateAnimator()
+    {
+        animator.SetBool("isWalking", currentState == PlayerState.Walking);
+        animator.SetBool("isJumping", currentState == PlayerState.Jumping);
+        animator.SetBool("isFalling", currentState == PlayerState.Falling);
+        animator.SetBool("isDead", currentState == PlayerState.Dead);
+    }
+
 }

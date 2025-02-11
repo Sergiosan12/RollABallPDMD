@@ -137,6 +137,7 @@ GameObject:
   - component: {fileID: 14029204}
   - component: {fileID: 14029206}
   - component: {fileID: 14029205}
+  - component: {fileID: 14029207}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -305,6 +306,27 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!95 &14029207
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 14029199}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f29ab93e5a5b4efedb49314a9645b74c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &60139825
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5014,11 +5036,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 14029199}
-  thirdPersonHeight: 10
-  thirdPersonDistance: 10
-  thirdPersonAngle: 90
+  TerceraPersonaHeight: 10
+  TerceraPersonaDistance: 10
+  TerceraPersonaAngle: 90
   rotationSpeed: 100
-  firstPersonHeightOffset: 0.5
+  PrimeraPersonaHeightOffset: 0.5
 --- !u!1 &1022521445
 GameObject:
   m_ObjectHideFlags: 0
