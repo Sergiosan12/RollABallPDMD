@@ -16,12 +16,12 @@ El jugador puede moverse en el entorno 3D utilizando las teclas de flecha. El mo
 ### **Control de Cámaras**
 El jugador puede cambiar entre la vista en primera persona y la vista en tercera persona presionando los botones 1 y 2, respectivamente. Esto permite al jugador elegir la perspectiva que prefiera para jugar.
 
-![cambioCamara](https://github.com/user-attachments/assets/b722f256-47be-4a46-8b28-0efa96a839a3)
+![Cambio de cámara](GifsImages/cambioCamara.gif)
 
 ### **Contacto con Obstáculos**
 El jugador puede interactuar con varios obstáculos en el entorno. Estos obstáculos pueden ser derribados o empujados, añadiendo un elemento de física al juego.
 
-![Obstaculos](https://github.com/user-attachments/assets/f969fdf1-84a7-43d2-bc08-e7cb6f1fe108)
+![Obstáculos](GifsImages/Obstaculos.gif)
 
 ### **Recolección de Pickups**
 El jugador puede recoger objetos etiquetados como "PickUp". Al recoger estos objetos, se incrementa un contador y el objeto se desactiva. El objetivo es recoger todos los pickups para ganar el juego.
@@ -29,27 +29,31 @@ El jugador puede recoger objetos etiquetados como "PickUp". Al recoger estos obj
 ### **Persecución del Enemigo**
 Dos enemigos persiguen al jugador, creando un desafío adicional. Los enemigos se mueven hacia el jugador, aumentando la dificultad del juego.
 
-![EnemigoYPickUp](https://github.com/user-attachments/assets/3b5a2f4e-b58b-41c7-97ee-51fba2b61c4d)
+![Enemigo y Pick Up](GifsImages/EnemigoYPickUp.gif)
+
 
 ### **Boost de la Rampa**
 El jugador puede recibir un impulso al pasar por una rampa especial. Este impulso permite saltos más altos o movimientos más rápidos.
 
-![saltoRampa](https://github.com/user-attachments/assets/588bfddc-aa59-42ec-b7f2-7669143d6ad7)
+![Salto Rampa](GifsImages/saltoRampa.gif)
+
 
 ### **Salto del Jugador**
 El jugador puede saltar al presionar la tecla de espacio. El salto se realiza aplicando una fuerza hacia arriba, y solo es posible si el jugador está en el suelo.
 
-![SaltoYDerribables](https://github.com/user-attachments/assets/d41db3b9-fbc6-42bf-b43b-a5d886ec26a8)
+![Salto y Derribables](GifsImages/SaltoYDerribables.gif)
+
 
 ### **Condición de Derrota**
 Si un enemigo toca al jugador, se muestra un mensaje de "¡Perdiste!" en la pantalla, indicando que el jugador ha sido atrapado.
 
-![Perder](https://github.com/user-attachments/assets/c1a43ebe-aee2-4462-97c3-267c80798686)
+![Perder](GifsImages/Perder.gif)
+
 
 ### **Condición de Victoria**
 Cuando el jugador recoge todos los pickups, se muestra un mensaje de "¡Ganaste!" en la pantalla. Además, los enemigos son eliminados automáticamente al alcanzar la puntuación máxima.
 
-![Ganar](https://github.com/user-attachments/assets/62387a24-273e-43ca-955e-ab4d64a501cf)
+![Ganar](GifsImages/Ganar.gif)
 
 </details>
 
@@ -115,6 +119,75 @@ El script `Rotator.cs` se encarga de rotar continuamente un objeto en el juego.
    - En el método `Update()`, se aplica una rotación constante al objeto utilizando `transform.Rotate()`.
    - La rotación se realiza en el eje Z con velocidad de 50 grados por segundo para que gire solo sobre ese eje.
    - `Time.deltaTime` se utiliza para asegurar que la rotación sea independiente de la velocidad de fotogramas.
+
+</details>
+
+<details>
+
+   <summary><b>USO DE ESTADOS</b></summary>
+
+### **Uso de Estados**
+
+**¿Por qué usar estados?**
+
+En un videojuego, un personaje puede realizar varias acciones: caminar, saltar, caer, atacar, etc. Para gestionar estas acciones de manera eficiente y evitar conflictos entre ellas, se utilizan **estados**.
+
+Ventajas de usar un sistema de estados
+✔ Código más organizado: Separa la lógica de cada acción del personaje.
+✔ Evita errores: Controla las transiciones entre estados sin conflictos.
+✔ Facilita la depuración: Es más fácil identificar problemas cuando cada acción tiene su propio estado.
+✔ Escalabilidad: Permite agregar nuevos estados sin afectar los existentes.
+
+**Uso de Estados en este Proyecto**
+  
+En este juego, el personaje tiene los siguientes estados:
+
+1️⃣ Idle (Quieto)
+👉 Cuando el jugador no se está moviendo ni saltando.
+
+2️⃣ Walking (Caminando)
+👉 Cuando el jugador se mueve con las teclas de dirección.
+👉 Solo se activa si el jugador está en el suelo.
+
+3️⃣ Jumping (Saltando)
+👉 Se activa al presionar la barra espaciadora cuando el jugador está en el suelo.
+👉 Mientras está en el aire por un salto, permanece en este estado.
+
+4️⃣ Falling (Cayendo)
+👉 Se activa cuando el jugador está en el aire pero ya no está subiendo (ejemplo: después de alcanzar la altura máxima del salto o al caminar fuera de una plataforma).
+👉 Finaliza cuando el personaje toca el suelo.
+
+**Como se gestionan los estados en el código**
+El estado del jugador se maneja con una enumeración (enum) y una variable que almacena el estado actual:
+```bash
+private enum PlayerState { Idle, Walking, Jumping, Falling, Dead }
+private PlayerState currentState;
+```
+
+**Transiciones entre Estados**
+Los estados cambian bajo ciertas condiciones:
+
+- Idle → Walking → Cuando el jugador presiona una tecla de movimiento.
+- Idle/Walking → Jumping → Cuando el jugador presiona la tecla de salto y está en el suelo.
+- Jumping → Falling → Cuando el personaje alcanza la cima del salto y empieza a descender.
+- Falling → Idle / Walking → Cuando el personaje toca el suelo, vuelve a Idle si no se mueve, o a Walking si sigue moviéndose.
+
+Este cambio se actualiza en el método UpdateAnimator() que sincroniza el estado con las animaciones:
+
+```bash
+void UpdateAnimator()
+{
+    animator.SetBool("isWalking", currentState == PlayerState.Walking);
+    animator.SetBool("isJumping", currentState == PlayerState.Jumping);
+    animator.SetBool("isFalling", currentState == PlayerState.Falling);
+}
+```
+
+**Animator Controller en Unity**
+
+El Animator Controller es una herramienta en Unity que permite gestionar las animaciones de un personaje mediante un sistema de estados y transiciones. De esta manera se puede observar de manera muy visual los cambios de estados en el juego a medida que avanza.
+
+![Cambio de Estados](GifsImages/CambioEstados.gif)
 
 </details>
 
