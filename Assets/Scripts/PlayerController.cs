@@ -62,31 +62,12 @@ public class PlayerController : MonoBehaviour
         {
         if (isGrounded && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            animator.SetBool("isJumping", true);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); // El jugador salta
             isGrounded = false;
             currentState = PlayerState.Jumping; // Actualiza el estado del jugador a Jumping
             UpdateAnimator();
         }
-        else if (!isGrounded)
-        {
-            animator.SetBool("isJumping", false);
-            animator.SetBool("isFalling", true);
-        }
-        else
-        {
-            animator.SetBool("isFalling", false);
-        }    
-        if (movementX != 0 || movementY != 0)
-        {
-            animator.SetBool("isWalking", true);
-        }
-        else
-        {
-            animator.SetBool("isWalking", false);
-        }
 
-        
     }
 
     // Se llama cuando el jugador colisiona con un objeto
@@ -169,6 +150,7 @@ public class PlayerController : MonoBehaviour
         rb.AddForce(movement * speed); // Aplica la fuerza de movimiento al jugador
     }
 
+    // Se llama para actualizar el animador
     void UpdateAnimator()
     {
         animator.SetBool("isWalking", currentState == PlayerState.Walking);
