@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         isGrounded = false;
         currentState = PlayerState.Idle; // Estado inicial del jugador es Idle
-        animator = GetComponent<Animator>();
+        animator = GetComponent<Animator>(); // Inicializo el animator
 
     }
 
