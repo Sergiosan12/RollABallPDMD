@@ -103,17 +103,26 @@ public class PlayerController : MonoBehaviour
             Debug.Log("El jugador ha tocado un enemigo.");
             currentState = PlayerState.Dead; // Se cambia el estado a Dead
             UpdateAnimator();
-            Destroy(gameObject); // Se destruye el jugador
             winTextObject.SetActive(true); // Se muestra el mensaje de perder
-            winTextObject.GetComponent<TextMeshProUGUI>().text = "Perdiste!"; // Se muestra el mensaje de perder
+            winTextObject.GetComponent<TextMeshProUGUI>().text = "Perdiste!"; 
+
+            gameObject.SetActive(false); // Desactiva el jugador para simular que desaparece
+
+            Invoke("RestartGame", 1.5f); // Llama a la función para reiniciar el juego después de 3 segundos
         }
         else if (other.gameObject.CompareTag("PickUp")) // Si el jugador colisiona con un PickUp
         {
-            Debug.Log("Se ha recogido un PickUp."); 
-            other.gameObject.SetActive(false); // Se desactiva el PickUp
-            count++; // Se incrementa la puntuación
+            Debug.Log("Se ha recogido un PickUp.");
+            other.gameObject.SetActive(false);
+            count++;
             SetCountText();
         }
+    }
+
+    // Función para reiniciar el juego
+    void RestartGame()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
 
     // Se llama para actualizar la puntuación
