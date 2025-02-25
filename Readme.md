@@ -2,21 +2,17 @@
 
 ## Descripción
 
-Este proyecto es una implementación de un juego de tipo *Roll-a-ball* en Unity, donde se controla a un jugador (representado por una esfera) que puede moverse en un entorno 3D y recoger objetos mientras escapa de dos enemigos. El juego también incluye dos tipos de cámaras: una en tercera persona y otra en primera persona, que el jugador puede alternar. El objetivo es familiarizarse con el uso de *Rigidbody*, control de entrada del teclado, y manejo de cámaras en Unity.
+Este proyecto es una implementación de un juego de tipo *Roll-a-ball* en Unity, donde se controla a un jugador (representado por una esfera) que puede moverse en un entorno 3D y recoger objetos mientras escapa de dos enemigos. El juego tiene las funcionalidades necesarias para jugarse en dispositivos móviles mediante una apk.
 
-puede moverse en un entorno 3D y recoger objetos mientras escapa de dos enemigos. El juego también incluye dos tipos de cámaras: una en tercera persona y otra en primera persona, que el jugador puede alternar. El objetivo es familiarizarse con el uso de *Rigidbody*, control de entrada del teclado, y manejo de cámaras en Unity.
 
 <details>
 
    <summary><b>FUNCIONALIDADES IMPLEMENTADAS</b></summary>
 
 ### **Movimiento del Jugador**
-El jugador puede moverse en el entorno 3D utilizando las teclas de flecha. El movimiento se controla aplicando fuerzas físicas, lo que permite un control suave y realista.
-
-### **Control de Cámaras**
-El jugador puede cambiar entre la vista en primera persona y la vista en tercera persona presionando los botones 1 y 2, respectivamente. Esto permite al jugador elegir la perspectiva que prefiera para jugar.
-
-![Cambio de cámara](GifsImages/cambioCamara.gif)
+El jugador puede moverse en el entorno 3D utilizando el sensor de movimiento
+del móvil. Dependiendo de en que dirección gire el rote el móvil el jugador
+se moverá de acorde a esos movimientos.
 
 ### **Contacto con Obstáculos**
 El jugador puede interactuar con varios obstáculos en el entorno. Estos obstáculos pueden ser derribados o empujados, añadiendo un elemento de física al juego.
@@ -63,14 +59,12 @@ Cuando el jugador recoge todos los pickups, se muestra un mensaje de "¡Ganaste!
 
 ### `PlayerController.cs`
 
-El script `PlayerController.cs` maneja el control del jugador, permitiendo su movimiento en función de las teclas de flecha y la interacción con objetos dentro del juego. A continuación, se explica cómo se implementa el movimiento del jugador:
+El script `PlayerController.cs` maneja el control del jugador, permitiendo su movimiento en función de la posición del dispositivo móvil.
 
 1. **Movimiento del Jugador**:  
-   El jugador se mueve en el espacio 3D utilizando un `Rigidbody` para aplicar fuerzas de movimiento. Las teclas de flecha controlan el movimiento del jugador en el plano horizontal (X y Y).
+   El jugador se mueve en el espacio 3D utilizando un `Rigidbody` para aplicar fuerzas de movimiento.
    
-   - Se detecta si se presionan las teclas de flecha (`Keyboard.current.upArrowKey`, `Keyboard.current.downArrowKey`, `Keyboard.current.leftArrowKey`, `Keyboard.current.rightArrowKey`).
-   - Cuando se detecta un movimiento, se actualizan las variables `movementX` y `movementY` con los valores correspondientes.
-   - En el método `FixedUpdate()`, se calcula el movimiento relativo a la cámara para que el jugador se mueva en la misma dirección en que la cámara está mirando.
+   - Se detecta si se mueve el móvil en diferentes direcciones con los métodos `Input.acceleration.x` e `Input.acceleration.y` que detectan la posición y movimiento del móvil.
 
 2. **Interacción con Objetos**:  
    El jugador puede recoger objetos etiquetados con "PickUp". Cada vez que el jugador entra en contacto con un objeto de este tipo, el contador aumenta y el objeto se desactiva.

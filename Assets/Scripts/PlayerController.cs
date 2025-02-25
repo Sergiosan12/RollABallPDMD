@@ -45,31 +45,22 @@ public class PlayerController : MonoBehaviour
     }
 
     void FixedUpdate()
-    {
-        if (currentState == PlayerState.Dead)
-            return;
+{
+    if (currentState == PlayerState.Dead)
+        return;
 
-        Vector3 forward = cameraTransform.forward;
-        Vector3 right = cameraTransform.right;
+    Vector3 dir = Vector3.zero;
 
-        forward.y = 0f;
-        right.y = 0f;
+    // Movimiento del acelerómetro
+    dir.x = Input.acceleration.x;  // Movimiento en horizontal
+    dir.z = Input.acceleration.y;  // Movimiento en vertical (depende de la orientación)
 
-        forward.Normalize();
-        right.Normalize();
+    if (dir.sqrMagnitude > 1)
+        dir.Normalize();  // Normaliza para evitar velocidades muy altas
 
-        Vector2 touchDelta = Vector2.zero;
-        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed)
-        {
-            touchDelta = Touchscreen.current.primaryTouch.delta.ReadValue();
-        }
+    rb.AddForce(dir * speed, ForceMode.Acceleration);  // Aplica fuerza al Rigidbody
+}
 
-        movementX = touchDelta.x / Screen.width;
-        movementY = touchDelta.y / Screen.height;
-
-        Vector3 movement = forward * movementY + right * movementX;
-        rb.AddForce(movement * speed);
-    }
 
     void OnCollisionStay(Collision collision)
     {
